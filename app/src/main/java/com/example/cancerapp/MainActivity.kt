@@ -10,12 +10,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.cancerapp.screens.Diagnosis
 import com.example.cancerapp.screens.Home
+import com.example.cancerapp.screens.Screen1
+import com.example.cancerapp.screens.Screen2
+import com.example.cancerapp.screens.Screen3
+
 import com.example.cancerapp.ui.theme.CancerappTheme
 
 class MainActivity : ComponentActivity() {
@@ -27,21 +32,33 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = Color(0xFFECD0DA)
                 ) {
                     val navController = rememberNavController()
                     val coroutineScope = rememberCoroutineScope()
                     val context = LocalContext.current
-                    NavHost(navController=navController, startDestination = "home"){
-                        composable("home"){
-                            Home(coroutineScope,context,navController)
+                    NavHost(navController = navController, startDestination = "Screen1") {
+                        composable("home") {
+                            Home(coroutineScope, context, navController)
                         }
-                        composable("diagnosis"){
+                        composable("diagnosis") {
                             Diagnosis(coroutineScope, navController)
                         }
+                        composable("Screen1") {
+                            Screen1(coroutineScope, context, navController)
+
+                        }
+                        composable("Screen2") {
+                            Screen2(coroutineScope, context, navController)
+
+                        }
+                        composable("Screen3") {
+                            Screen3(coroutineScope, context, navController)
+
+                        }
+
+
                     }
-
-
                 }
             }
         }

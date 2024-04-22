@@ -264,15 +264,16 @@ fun Diagnosis(
                         }
                     }
                 }
+                Spacer(modifier = Modifier.height(20.dp))
 
-                ElevatedButton(
+                Button(
                     modifier = Modifier
                         .padding(8.dp),
                     onClick = {
                     coroutineScope.launch {
                     }
                 }) {
-                    Text(text = "Save", fontSize = 22.sp, fontWeight = FontWeight.SemiBold)
+                    Text(text = "Generate report", fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
                 }
 
             }

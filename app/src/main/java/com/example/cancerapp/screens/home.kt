@@ -39,9 +39,9 @@ fun Home(coroutine: CoroutineScope, context: Context, navController: NavControll
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter= painterResource(id =R.mipmap.ic_launcher_foreground),
+                painter= painterResource(id =R.mipmap.logo_foreground),
                 contentDescription = null,
-                modifier = Modifier.size(400.dp),
+                modifier = Modifier.size(300.dp),
 
             )
             Spacer(modifier = Modifier.height(20.dp))
