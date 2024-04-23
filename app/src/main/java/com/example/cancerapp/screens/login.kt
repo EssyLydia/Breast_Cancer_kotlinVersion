@@ -1,9 +1,9 @@
-package com.example.etonsillitis.screens.Accounts
+package com.example.cancerapp.screens
+
+
 import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -11,24 +11,23 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -47,17 +47,9 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.etonsillitis.Dashboard
-import com.example.etonsillitis.R
-import com.example.etonsillitis.screens.Dashboard.uploadPicture
-
+import com.example.cancerapp.R
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-
 
 
 @Composable
@@ -66,7 +58,7 @@ fun Login(
     coroutine: CoroutineScope,
     navController: NavController,
 
-) {
+    ) {
     var email by remember {
         mutableStateOf("")
     }
@@ -95,9 +87,11 @@ fun Login(
         item {
             Spacer(modifier = Modifier.height(5.dp))
             Image(
-                painter = painterResource(id = R.drawable.logo),
+                imageVector = Icons.Default.AccountCircle,
                 contentDescription = null,
-                modifier = Modifier.fillMaxSize(.2f)
+                modifier = Modifier
+                    .size(100.dp)
+                    .padding(start = 2.dp)
             )
             Spacer(modifier = Modifier.height(5.dp))
         }
@@ -108,10 +102,10 @@ fun Login(
                         .fillMaxWidth()
                         .height(40.dp),
                     shape = RoundedCornerShape(0.dp),
-                    colors = CardDefaults.cardColors(Color(0xFFA83232))
+                    colors = CardDefaults.cardColors(Color.Black)
                 ) {
                     Text(
-                        text = "Fields are empty or Invalid login details",
+                        text = " Invalid login details",
                         color = Color.White,
                         modifier = Modifier.padding(5.dp, 8.dp)
                     )
@@ -122,14 +116,18 @@ fun Login(
 
         item {
             Spacer(modifier = Modifier.height(13.dp))
-            Text(text = "Login", fontSize = 35.sp, fontWeight = FontWeight.Bold)
+            Text(text = "WELCOME BACK", fontSize = 30.sp, fontWeight = FontWeight.Bold)
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = "Log in to your account", fontSize = 20.sp, fontWeight = FontWeight.Medium)
         }
 
         item {
             Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(value = email,
+            OutlinedTextField(
+                value = email,
                 onValueChange = { email = it },
-                label = { Text(text = "Email") },
+                label = { Text(text = "Username", color = Color.Black) },
                 keyboardOptions = KeyboardOptions(
                     KeyboardCapitalization.None, false, KeyboardType.Email
                 ),
@@ -141,9 +139,10 @@ fun Login(
 
         item {
             Spacer(modifier = Modifier.height(5.dp))
-            OutlinedTextField(value = password,
+            OutlinedTextField(
+                value = password,
                 onValueChange = { password = it },
-                label = { Text(text = "Password") },
+                label = { Text(text = "Password", color = Color.Black) },
                 trailingIcon = {
                     IconButton(onClick = {
                         passVisual = !passVisual
@@ -170,14 +169,14 @@ fun Login(
             Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth(.8f)) {
                 TextButton(onClick = {
                     coroutine.launch {
-                        navController.navigate("Recovery")
+                        navController.navigate("Recover")
                     }
                 }) {
                     Text(
                         text = "Forgot Password?",
                         style = TextStyle(
                             textDecoration = TextDecoration.Underline,
-                            color = MaterialTheme.colorScheme.primary
+                            color =MaterialTheme.colorScheme.primary
                         )
                     )
 
@@ -190,12 +189,11 @@ fun Login(
             Button(
                 onClick = {
                     coroutine.launch {
+                        navController.navigate("Diagnosis")
 //                        if (password.isNotEmpty() && email.isNotEmpty()) {
 //                            val rs = user.getUser(email, password)
 //                            if (rs != null && rs.email == email && rs.pass == password)
-                        context.startActivity(
-                            Intent(context, Dashboard::class.java)
-                        )
+
 //                            else{
 //                                blankInpt = true
 //                                delay(2500)
@@ -214,30 +212,34 @@ fun Login(
                     .fillMaxWidth(.8f)
                     .height(42.dp)
             ) {
-                Text(text = "Login", color=Color.White)
+                Text(text = "Login", color = Color.White)
             }
         }
 
         item {
             Spacer(modifier = Modifier.height(15.dp))
-            Text(text = "Don't Have an Account?")
-            Spacer(modifier = Modifier.height(15.dp))
+            Row (horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth(.8f)){
+                Text(text = "Don't have an account?")
+                ClickableText(
+                    text = AnnotatedString("Signup"),
+                    style= TextStyle(color=Color(0xFFE91E63)),
+                    onClick = {
+                        coroutine.launch {
+                            navController.navigate("Signup")
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(2.dp),
+
+
+                    )
+            }
+
         }
 
-        item {
-            OutlinedButton(
-                onClick = {
-                    coroutine.launch {
-                        navController.navigate("Register")
-                    }
-                }, modifier = Modifier
-                    .fillMaxWidth(.8f)
-                    .height(42.dp)
-            ) {
-                Text(text = "Register")
-            }
-        }
 
 //
 
-}}
+    }
+}

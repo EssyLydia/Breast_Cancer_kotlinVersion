@@ -17,11 +17,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.cancerapp.screens.Diagnosis
 import com.example.cancerapp.screens.Home
+import com.example.cancerapp.screens.Login
+import com.example.cancerapp.screens.Recover
 import com.example.cancerapp.screens.Screen1
 import com.example.cancerapp.screens.Screen2
 import com.example.cancerapp.screens.Screen3
+import com.example.cancerapp.screens.Signup
 
 import com.example.cancerapp.ui.theme.CancerappTheme
+
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -32,7 +36,7 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = Color(0xFFECD0DA)
+                    color = Color(0xFFFDC2D7)
                 ) {
                     val navController = rememberNavController()
                     val coroutineScope = rememberCoroutineScope()
@@ -54,6 +58,18 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("Screen3") {
                             Screen3(coroutineScope, context, navController)
+
+                        }
+                        composable("Login") {
+                            Login( context, coroutineScope,navController)
+
+                        }
+                        composable("Signup") {
+                            Signup( context, coroutineScope,navController)
+
+                        }
+                        composable("Recover") {
+                            Recover( context, coroutineScope,navController)
 
                         }
 

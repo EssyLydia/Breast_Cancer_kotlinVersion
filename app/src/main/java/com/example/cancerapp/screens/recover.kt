@@ -1,9 +1,10 @@
-package com.example.etonsillitis.screens.Accounts
+package com.example.cancerapp.screens
 
 import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,33 +14,38 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -48,44 +54,31 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.etonsillitis.Dashboard
-import com.example.etonsillitis.R
+import com.example.cancerapp.R
+
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-
 @Composable
-fun Register(
-    context: Context, coroutine: CoroutineScope, navController: NavController
-) {
+fun Recover(context: Context, coroutine: CoroutineScope, navController: NavController) {
 
-    var email by remember {
+    var username by remember {
         mutableStateOf("")
     }
-    var fname by remember {
+    var pass by remember {
         mutableStateOf("")
     }
-    var lname by remember {
+    var confirm by remember {
         mutableStateOf("")
-    }
-
-    var password by remember {
-        mutableStateOf("")
-    }
-    var Rpassword by remember {
-        mutableStateOf("")
-    }
-
-    var passVisual by remember {
-        mutableStateOf(true)
     }
 
     var blankInpt by remember {
         mutableStateOf(false)
     }
-
-
+    var passVisual by remember {
+        mutableStateOf(true)
+    }
 
 
     LazyColumn(
@@ -98,34 +91,22 @@ fun Register(
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight(.2f)
-                    .background(MaterialTheme.colorScheme.primary)
+
             ) {
                 IconButton(
                     onClick = {
                         coroutine.launch {
-                            navController.navigate("Recovery")
+                            navController.navigate("Login")
                         }
                     }, modifier = Modifier.padding(2.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                        imageVector = Icons.Default.KeyboardArrowLeft,
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize(.8f)
                     )
                 }
-                Image(
-                    painter = painterResource(id = R.drawable.logo),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxSize(.2f)
-                        .padding(start = 2.dp)
-                )
-                Text(
-                    text = "Accounts",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 2.dp)
-                )
+
             }
         }
         if (blankInpt) {
@@ -149,43 +130,25 @@ fun Register(
 
         item {
             Spacer(modifier = Modifier.height(30.dp))
-            Text(text = "Register", fontSize = 35.sp, fontWeight = FontWeight.Bold)
-        }
-        item {
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                value = fname,
-                onValueChange = { fname = it },
-                label = { Text(text = "First Name") },
-                keyboardOptions = KeyboardOptions(
-                    KeyboardCapitalization.Sentences, false, KeyboardType.Text
-                ),
+            Image(
+                imageVector = Icons.Default.Lock,
+                contentDescription = null,
                 modifier = Modifier
-                    .fillMaxWidth(.8f)
-                    .fillMaxHeight(.08f)
+                    .size(100.dp)
+                    .padding(start = 2.dp)
             )
-        }
-        item {
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                value = lname,
-                onValueChange = { lname = it },
-                label = { Text(text = "Last Name") },
-                keyboardOptions = KeyboardOptions(
-                    KeyboardCapitalization.Sentences, false, KeyboardType.Text
-                ),
-                modifier = Modifier
-                    .fillMaxWidth(.8f)
-                    .fillMaxHeight(.08f)
-            )
+            Text(text = "Reset your password here", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(text = "Enter your new password below")
+
         }
 
         item {
+
             Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text(text = "Email") },
+            TextField(value = username,
+                colors=TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent, focusedContainerColor = Color.Transparent),
+                onValueChange = { username = it },
+                label = { Text(text = "Username") },
                 keyboardOptions = KeyboardOptions(
                     KeyboardCapitalization.None, false, KeyboardType.Email
                 ),
@@ -193,14 +156,15 @@ fun Register(
                     .fillMaxWidth(.8f)
                     .fillMaxHeight(.08f)
             )
-        }
-
-        item {
-            Spacer(modifier = Modifier.height(5.dp))
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text(text = "Password") },
+            Spacer(modifier = Modifier.height(8.dp))
+            TextField(value = pass,
+                colors=TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent, focusedContainerColor = Color.Transparent),
+                onValueChange = { pass = it },
+                label = { Text(text = "New Password") },
+                keyboardOptions = KeyboardOptions(
+                    KeyboardCapitalization.None, false, KeyboardType.Password
+                ),
+                visualTransformation = if (passVisual) PasswordVisualTransformation() else VisualTransformation.None,
                 trailingIcon = {
                     IconButton(onClick = { passVisual = !passVisual }) {
                         Icon(
@@ -212,19 +176,22 @@ fun Register(
                     }
 
                 },
-                visualTransformation = if (passVisual) PasswordVisualTransformation() else VisualTransformation.None,
+
                 modifier = Modifier
                     .fillMaxWidth(.8f)
                     .fillMaxHeight(.08f)
             )
-        }
 
-        item {
-            Spacer(modifier = Modifier.height(5.dp))
-            OutlinedTextField(
-                value = Rpassword,
-                onValueChange = { Rpassword = it },
-                label = { Text(text = "Re-Enter Password") },
+
+            Spacer(modifier = Modifier.height(8.dp))
+            TextField(value = confirm,
+                colors=TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent, focusedContainerColor = Color.Transparent),
+                onValueChange = { confirm = it },
+                label = { Text(text = "Confirm Password") },
+                keyboardOptions = KeyboardOptions(
+                    KeyboardCapitalization.None, false, KeyboardType.Password
+                ),
+                visualTransformation = if (passVisual) PasswordVisualTransformation() else VisualTransformation.None,
                 trailingIcon = {
                     IconButton(onClick = { passVisual = !passVisual }) {
                         Icon(
@@ -236,64 +203,36 @@ fun Register(
                     }
 
                 },
-                visualTransformation = if (passVisual) PasswordVisualTransformation() else VisualTransformation.None,
+
                 modifier = Modifier
                     .fillMaxWidth(.8f)
                     .fillMaxHeight(.08f)
             )
         }
 
+
         item {
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(20.dp))
             Button(
                 onClick = {
                     coroutine.launch {
-
-                        if (password.isNotEmpty() && email.isNotEmpty() && Rpassword.isNotEmpty()) {
-                            //navController.navigate(links.verifyAcc)
-
-
-                            context.startActivity(
-                                Intent(context, Dashboard::class.java)
-                            )
-                        } else {
+                        if (username.isNotEmpty())
+                            navController.navigate("Login")
+                        else {
                             blankInpt = true
+                            delay(2500)
 
-                            delay(500)
                             blankInpt = false
                         }
-
-                        
                     }
                 }, modifier = Modifier
                     .fillMaxWidth(.8f)
                     .height(42.dp)
             ) {
-                Text(text = "Proceed")
-
-            }
-        }
-
-        item {
-            Spacer(modifier = Modifier.height(15.dp))
-            Text(text = "Already have an Account?")
-            Spacer(modifier = Modifier.height(15.dp))
-        }
-
-        item {
-            OutlinedButton(
-                onClick = {
-                    coroutine.launch {
-                        navController.navigate("login")
-                    }
-                }, modifier = Modifier
-                    .fillMaxWidth(.8f)
-                    .height(42.dp)
-            ) {
-                Text(text = "Login")
+                Text(text = "Reset")
             }
         }
 
     }
-
 }
+

@@ -39,7 +39,7 @@ fun Home(coroutine: CoroutineScope, context: Context, navController: NavControll
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter= painterResource(id =R.mipmap.logo_foreground),
+                painter= painterResource(id =R.mipmap.ic_launcher_foreground),
                 contentDescription = null,
                 modifier = Modifier.size(300.dp),
 
@@ -65,7 +65,7 @@ fun Home(coroutine: CoroutineScope, context: Context, navController: NavControll
                 onClick = {
 
                     coroutine.launch {
-                        navController.navigate("diagnosis")
+                        navController.navigate("Signup")
                     }
                 }, modifier = Modifier.fillMaxWidth(.85f),
                    colors= ButtonDefaults.elevatedButtonColors(containerColor = Color(0xFFE91E63))
