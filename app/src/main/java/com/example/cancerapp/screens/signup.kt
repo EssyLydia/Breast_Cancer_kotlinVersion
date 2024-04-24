@@ -2,6 +2,7 @@ package com.example.cancerapp.screens
 
 import android.content.Context
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -50,8 +51,10 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -238,7 +241,7 @@ fun Signup(
                     coroutine.launch {
 
                         if (password.isNotEmpty() && email.isNotEmpty() && Cpassword.isNotEmpty()) {
-                            navController.navigate("Login")
+                            Sign(name, email,password,Cpassword,navController,context)
 
                         } else {
                             blankInpt = true
@@ -288,4 +291,36 @@ fun Signup(
 
     }
 
+}
+
+fun Sign(
+    username: String,
+    email: String,
+    password: String,
+    confirmPassword: String,
+    navController: NavController,
+    context: Context
+) {
+    if (password == confirmPassword) {
+        FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    // Sign-up successful
+                    navController.navigate("Login")
+                } else {
+                    // Sign-up failed
+                    Toast.makeText(
+                        context,
+                        "Sign-up failed. Please try again.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+    } else {
+        Toast.makeText(
+            context,
+            "Passwords do not match.",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
 }

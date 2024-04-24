@@ -2,6 +2,7 @@ package com.example.cancerapp.screens
 
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -48,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.cancerapp.R
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -127,7 +129,7 @@ fun Login(
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text(text = "Username", color = Color.Black) },
+                label = { Text(text = "Email", color = Color.Black) },
                 keyboardOptions = KeyboardOptions(
                     KeyboardCapitalization.None, false, KeyboardType.Email
                 ),
@@ -189,24 +191,12 @@ fun Login(
             Button(
                 onClick = {
                     coroutine.launch {
-                        navController.navigate("Diagnosis")
-//                        if (password.isNotEmpty() && email.isNotEmpty()) {
-//                            val rs = user.getUser(email, password)
-//                            if (rs != null && rs.email == email && rs.pass == password)
+                        if (password.isNotEmpty() && email.isNotEmpty()) {
+                            Loginuser(email, password, navController,context)
 
-//                            else{
-//                                blankInpt = true
-//                                delay(2500)
-//
-//                                blankInpt = false
-//                            }
-//                        }
-//                        else {
-//                            blankInpt = true
-//                            delay(2500)
-//
-//                            blankInpt = false
-//                        }
+
+                        }
+
                     }
                 }, modifier = Modifier
                     .fillMaxWidth(.8f)
@@ -242,4 +232,26 @@ fun Login(
 //
 
     }
+}
+
+fun Loginuser(
+    useremail: String,
+    password: String,
+    navController: NavController,
+    context: Context
+) {
+    FirebaseAuth.getInstance().signInWithEmailAndPassword(useremail, password)
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                // Login successful
+                navController.navigate("Diagnosis")
+            } else {
+                // Login failed
+                Toast.makeText(
+                    context,
+                    "Login failed. Please check your credentials.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
 }

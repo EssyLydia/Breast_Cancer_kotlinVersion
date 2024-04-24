@@ -63,7 +63,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun Recover(context: Context, coroutine: CoroutineScope, navController: NavController) {
 
-    var username by remember {
+    var email by remember {
         mutableStateOf("")
     }
     var pass by remember {
@@ -145,10 +145,10 @@ fun Recover(context: Context, coroutine: CoroutineScope, navController: NavContr
         item {
 
             Spacer(modifier = Modifier.height(8.dp))
-            TextField(value = username,
+            TextField(value = email,
                 colors=TextFieldDefaults.colors(unfocusedContainerColor = Color.Transparent, focusedContainerColor = Color.Transparent),
-                onValueChange = { username = it },
-                label = { Text(text = "Username") },
+                onValueChange = { email = it },
+                label = { Text(text = "Email") },
                 keyboardOptions = KeyboardOptions(
                     KeyboardCapitalization.None, false, KeyboardType.Email
                 ),
@@ -216,7 +216,7 @@ fun Recover(context: Context, coroutine: CoroutineScope, navController: NavContr
             Button(
                 onClick = {
                     coroutine.launch {
-                        if (username.isNotEmpty())
+                        if (email.isNotEmpty())
                             navController.navigate("Login")
                         else {
                             blankInpt = true
