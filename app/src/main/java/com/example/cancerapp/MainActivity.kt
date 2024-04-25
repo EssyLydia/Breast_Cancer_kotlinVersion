@@ -19,6 +19,7 @@ import com.example.cancerapp.screens.Diagnosis
 import com.example.cancerapp.screens.Home
 import com.example.cancerapp.screens.Login
 import com.example.cancerapp.screens.Recover
+import com.example.cancerapp.screens.Report
 import com.example.cancerapp.screens.Screen1
 import com.example.cancerapp.screens.Screen2
 import com.example.cancerapp.screens.Screen3
@@ -70,6 +71,11 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("Recover") {
                             Recover( context, coroutineScope,navController)
+
+                        }
+
+                        composable("Report/{results}") {
+                            Report( context, coroutineScope,navController)
 
                         }
 

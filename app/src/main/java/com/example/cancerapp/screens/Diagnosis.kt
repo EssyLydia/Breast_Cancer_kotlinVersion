@@ -78,10 +78,9 @@ fun Diagnosis(
 
     val viewModel = ModelCode(context)
     var predictionResult by remember { mutableStateOf(Predictions()) }
-
-
-
-
+    var Path by  remember {
+        mutableStateOf("")
+    }
 
     val selectImage =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) { result ->
@@ -98,7 +97,7 @@ fun Diagnosis(
                     val formattedDateTime = currentDateTime.format(formatter)
 
                     // Save the bitmap to a file
-                    val imageName = "$formattedDateTime _tonsilSample.png"
+                    val imageName = "$formattedDateTime _breastSample.png"
                     val file = File(context.cacheDir, imageName)
 
                     val imageOutput = FileOutputStream(file)
@@ -109,10 +108,9 @@ fun Diagnosis(
                     val imagePath = file.absolutePath
                     viewModel.classifyImage(imagePath)
 
-                    predictionResult = viewModel.predictionResult.value!!
 
-                    // Upload the image to your server
-                    //uploadImageToServer(file, imageName, coroutineScope)
+                    predictionResult = viewModel.predictionResult.value!!
+                    Path = imagePath
 
                 } catch (e: FileNotFoundException) {
                     e.printStackTrace()
@@ -200,7 +198,7 @@ fun Diagnosis(
                 }
 
                 ElevatedCard(
-                    modifier=Modifier
+                    modifier= Modifier
                         .fillMaxWidth(0.85f)
                         .padding(8.dp)
 
@@ -228,7 +226,7 @@ fun Diagnosis(
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold
                                 )
-                                Text(text = "${predictionResult.Benign}")
+                                Text(text = "${predictionResult.Benign} %")
                             }
                             Row(
                                 modifier = Modifier
@@ -242,7 +240,7 @@ fun Diagnosis(
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold
                                 )
-                                Text(text = "${predictionResult.Malignant}")
+                                Text(text = "${predictionResult.Malignant} %")
                             }
                             Row(
                                 modifier = Modifier
@@ -256,7 +254,7 @@ fun Diagnosis(
                                     fontSize = 20.sp,
                                     fontWeight = FontWeight.Bold
                                 )
-                                Text(text = "${predictionResult.Undefined}")
+                                Text(text = "${predictionResult.Undefined} %")
                             }
 
 
@@ -271,6 +269,7 @@ fun Diagnosis(
                         .padding(8.dp),
                     onClick = {
                     coroutineScope.launch {
+                        navController.navigate("Report/${predictionResult.Benign},${predictionResult.Malignant},${predictionResult.Undefined}")
                     }
                 }) {
                     Text(text = "Generate report", fontSize = 17.sp, fontWeight = FontWeight.SemiBold)

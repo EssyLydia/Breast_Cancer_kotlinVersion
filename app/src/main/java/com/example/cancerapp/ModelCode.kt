@@ -26,7 +26,7 @@ class ModelCode(private val context: Context) : ViewModel() {
 
     private fun loadModel() {
         val assetManager = context.assets
-        val fileDescriptor = assetManager.openFd("converted_model.tflite")
+        val fileDescriptor = assetManager.openFd("model_unquant.tflite")
         val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
         val fileChannel = inputStream.channel
         val startOffset = fileDescriptor.startOffset
@@ -55,9 +55,9 @@ class ModelCode(private val context: Context) : ViewModel() {
         val predictedClass = outputFeature0.floatArray
 
         predictionResult.value = Predictions(
-           Benign = predictedClass[0],
-            Malignant = predictedClass[1],
-            //Undefined = predictedClass[2],
+           Benign = "%.2f".format(predictedClass[1].times(100)).toFloat(),
+            Malignant = "%.2f".format(predictedClass[2].times(100)).toFloat(),
+            Undefined = "%.2f".format(predictedClass[0].times(100)).toFloat(),
 
         )
     }
