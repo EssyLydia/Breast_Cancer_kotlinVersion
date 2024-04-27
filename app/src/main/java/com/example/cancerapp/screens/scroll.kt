@@ -41,7 +41,7 @@ fun Screen1(coroutine: CoroutineScope, context: Context, navController: NavContr
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(id = R.mipmap.screen1_foreground),
+                painter = painterResource(id = R.drawable.doctor_8482048),
                 contentDescription = null,
                 modifier = Modifier.size(400.dp),
 
@@ -54,6 +54,8 @@ fun Screen1(coroutine: CoroutineScope, context: Context, navController: NavContr
                 color = Color(0xFFE91E63),
                 modifier = Modifier.fillMaxWidth(.85f)
             )
+            Spacer(modifier = Modifier.height(20.dp))
+
             ElevatedButton(
                 onClick = {
 
@@ -80,7 +82,7 @@ fun Screen2(coroutine: CoroutineScope, context: Context, navController: NavContr
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(id = R.mipmap.screen2_foreground),
+                painter = painterResource(id = R.drawable.vect1),
                 contentDescription = null,
                 modifier = Modifier.size(400.dp),
 
@@ -93,6 +95,7 @@ fun Screen2(coroutine: CoroutineScope, context: Context, navController: NavContr
                 color = Color(0xFFE91E63),
                 modifier = Modifier.fillMaxWidth(.85f)
             )
+            Spacer(modifier = Modifier.height(20.dp))
 
             ElevatedButton(
                 onClick = {
@@ -120,7 +123,7 @@ fun Screen3(coroutine: CoroutineScope, context: Context, navController: NavContr
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(id = R.mipmap.screen3_foreground),
+                painter = painterResource(id = R.drawable.asset_1),
                 contentDescription = null,
                 modifier = Modifier.size(400.dp),
 
@@ -133,6 +136,7 @@ fun Screen3(coroutine: CoroutineScope, context: Context, navController: NavContr
                 color = Color(0xFFE91E63),
                 modifier = Modifier.fillMaxWidth(.85f)
             )
+            Spacer(modifier = Modifier.height(20.dp))
 
             ElevatedButton(
                 onClick = {

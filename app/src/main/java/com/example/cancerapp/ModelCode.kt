@@ -26,7 +26,7 @@ class ModelCode(private val context: Context) : ViewModel() {
 
     private fun loadModel() {
         val assetManager = context.assets
-        val fileDescriptor = assetManager.openFd("model_unquant.tflite")
+        val fileDescriptor = assetManager.openFd("model2.tflite")
         val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
         val fileChannel = inputStream.channel
         val startOffset = fileDescriptor.startOffset
@@ -81,6 +81,30 @@ class ModelCode(private val context: Context) : ViewModel() {
         }
         return byteBuffer
     }
+
+
+//private fun convertBitmapToByteBuffer(bitmap: Bitmap): ByteBuffer {
+//    val resizedBitmap = Bitmap.createScaledBitmap(bitmap, 224, 224, true)
+//
+//    val byteBuffer = ByteBuffer.allocateDirect(4 * 1 * 224 * 224 * 3) // float has 4 bytes
+//    byteBuffer.order(ByteOrder.nativeOrder())
+//
+//    val intValues = IntArray(224 * 224)
+//    resizedBitmap.getPixels(intValues, 0, resizedBitmap.width, 0, 0, resizedBitmap.width, resizedBitmap.height)
+//
+//    var pixel = 0
+//    for (i in 0 until 224) {
+//        for (j in 0 until 224) {
+//            val value = intValues[pixel++]
+//            byteBuffer.putFloat(((value shr 16 and 0xFF) - 127.5f) / 127.5f)
+//            byteBuffer.putFloat(((value shr 8 and 0xFF) - 127.5f) / 127.5f)
+//            byteBuffer.putFloat(((value and 0xFF) - 127.5f) / 127.5f)
+//        }
+//    }
+//
+//    return byteBuffer
+//}
+
 
 
 }

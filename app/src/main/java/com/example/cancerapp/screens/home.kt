@@ -39,7 +39,7 @@ fun Home(coroutine: CoroutineScope, context: Context, navController: NavControll
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter= painterResource(id =R.mipmap.ic_launcher_foreground),
+                painter= painterResource(id =R.drawable.butterfly_8127622),
                 contentDescription = null,
                 modifier = Modifier.size(300.dp),
 

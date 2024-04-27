@@ -1,23 +1,30 @@
 package com.example.cancerapp.screens
 
+import android.app.DatePickerDialog
 import android.content.Context
-import android.content.Intent
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.pdf.PdfDocument
-import android.net.Uri
-import android.os.Environment
-import android.provider.MediaStore
-import android.widget.Toast
+import android.os.Build
+import android.widget.DatePicker
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -27,15 +34,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.cancerapp.R
+import com.example.cancerapp.createAndSavePdf
 import kotlinx.coroutines.CoroutineScope
-import java.io.File
-import java.io.FileOutputStream
+import kotlinx.coroutines.launch
+import java.util.Calendar
+import java.util.Date
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Report(
     context: Context, coroutine: CoroutineScope, navController: NavController
@@ -47,8 +61,24 @@ fun Report(
     var doctorName by remember { mutableStateOf("") }
     val context = LocalContext.current
     val result = navController.currentBackStackEntry?.arguments?.getString("results")?.split(",")
+    var loader by remember {
+        mutableStateOf(false)
+    }
+
+    val mCalendar = Calendar.getInstance()
+    val mYear = mCalendar.get(Calendar.YEAR)
+    val mMonth = mCalendar.get(Calendar.MONTH)
+    val mDay = mCalendar.get(Calendar.DAY_OF_MONTH)
+    mCalendar.time = Date()
+
+    val mDate = remember { mutableStateOf("Date") }
 
 
+    val mDatePickerDialog = DatePickerDialog(
+        context, { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
+            mDate.value = "$mDayOfMonth/${mMonth + 1}/$mYear"
+        }, mYear, mMonth, mDay
+    )
 
     Column(
         modifier = Modifier
@@ -63,73 +93,97 @@ fun Report(
                 .fillMaxWidth(.85f)
                 .fillMaxHeight(.23f)
                 .padding(vertical = 15.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
         ) {
 
-            Button(
-                onClick = {
+            Image(
+                painter = painterResource(id = R.drawable.butterfly_8127622),
+                contentDescription = null,
+                modifier = Modifier.size(100.dp),
 
-                    val intent =
-                        Intent(
-                            Intent.ACTION_PICK,
-                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-                        )
-                    //selectImage.launch(intent)
-
-                }, modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(2.dp)
-                    .fillMaxHeight()
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.baseline_insert_photo_24),
-                    contentDescription = null
                 )
-                Text(text = "Select image")
-            }
+            Text(
+                "Generate Report",
+                fontSize = 23.sp,
+                fontWeight = FontWeight.Bold,
+            )
         }
 
         // Display classification results
-        Text("Classification Results:")
-        result?.forEach {
-            Text(it)
-        }
+        ElevatedCard(modifier = Modifier
+            .fillMaxWidth()
+        ) {
+            Text("Classification Results", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start,
+                modifier = Modifier.fillMaxWidth(.95f)
+            ) {
+                Text(
+                    text = "Benign: ", fontWeight = FontWeight.SemiBold, fontSize = 18.sp, modifier = Modifier.padding(5.dp)
+                )
+                Text(
+                    text = result?.get(0).toString(), modifier = Modifier.padding(5.dp)
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start,
+                modifier = Modifier.fillMaxWidth(.95f)
+            ) {
 
-        // Patient information inputs
-        TextField(
-            value = patientName,
+                Text(
+                    text = "Malignant: ", fontWeight = FontWeight.SemiBold, fontSize = 18.sp, modifier = Modifier.padding(5.dp)
+                )
+                Text(
+                    text = result?.get(1).toString(), modifier = Modifier.padding(5.dp)
+                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start,
+                modifier = Modifier.fillMaxWidth(.95f)
+            ) {
+
+                Text(
+                    text = "Unknown: ", fontWeight = FontWeight.SemiBold, fontSize = 18.sp, modifier = Modifier.padding(5.dp)
+                )
+                Text(
+                    text = result?.get(2).toString(), modifier = Modifier.padding(5.dp)
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(20.dp))
+
+        TextField(value = patientName,
             onValueChange = { patientName = it },
             label = { Text("Patient Name") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
         )
-        TextField(
-            value = age,
+
+        TextField(value = age,
             onValueChange = { age = it },
             label = { Text("Age") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
+//
         )
-        TextField(
-            value = gender,
+
+        TextField(value = gender,
             onValueChange = { gender = it },
-            label = { Text("Gender") },
+            label = { Text("Contact") },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
         )
-        TextField(
-            value = date,
-            onValueChange = { date = it },
-            label = { Text("Date") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        )
-        TextField(
-            value = doctorName,
+
+
+        TextField(value = doctorName,
             onValueChange = { doctorName = it },
             label = { Text("Doctor Name") },
             modifier = Modifier
@@ -137,156 +191,43 @@ fun Report(
                 .padding(vertical = 8.dp)
         )
 
+        Button(
+            onClick = { mDatePickerDialog.show() },
+            colors = ButtonDefaults.buttonColors(Color(0xFFD1C9C9)),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+                .border(
+                    0.dp, Color.Unspecified, RoundedCornerShape(1.dp)
+                ),
 
+            ) {
+            Text(text = mDate.value, color = Color.Black)
+        }
 
 
         Button(onClick = {
-            createAndSavePdf(null,patientName, age, gender,
-                date, doctorName, context,result,
-            )
+            coroutine.launch {
+                loader = true
+                createAndSavePdf(
+                    patientName, age, gender,
+                    date, doctorName, context, result,
+                )
+                loader = false
+            }
 
         }) {
-            Text("Generate and Download Report")
+            Text("Download Report")
         }
     }
+    if (loader) Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0x2C1565C0)),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator(modifier = Modifier.size(100.dp))
+
+    }
+
 }
-
-fun createAndSavePdf(
-    imageUri: Uri?,
-
-    patientName: String,
-    age: String,
-    gender: String,
-    date: String,
-    doctorName: String,
-    context: Context,
-    result: List<String>?
-) {
-    val pdfDocument = PdfDocument()
-
-    // Start a new page
-    val pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create() // A4 size in points
-    val page = pdfDocument.startPage(pageInfo)
-    val canvas = page.canvas
-
-    // Draw the image if available
-//    imageUri?.let { uri ->
-//        val imageBitmap = loadImage(uri, context)
-//        imageBitmap?.let { bitmap ->
-//            val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 200, 200, false)
-//            val imageLeft = 50f
-//            val imageTop = 50f
-//            canvas.drawBitmap(scaledBitmap, imageLeft, imageTop, null)
-//        }
-//    }
-
-    // Draw 'Report' text
-    val reportText = "Report"
-    val reportTextSize = 35f
-    val reportTextPaint = Paint().apply {
-        color = Color.BLACK
-        textSize = reportTextSize
-    }
-    val reportTextX = 300f // Adjust as needed
-    val reportTextY = 50f // Adjust as needed
-    canvas.drawText(reportText, reportTextX, reportTextY, reportTextPaint)
-
-    // Draw the content text
-    val contentTextPaint = Paint().apply {
-        color = Color.BLACK
-        textSize = 20f
-    }
-    val contentTextX = 50f // Adjust as needed
-    val contentTextY = 250f // Adjust as needed
-    result?.get(0)?.let { canvas.drawText(it, contentTextX, contentTextY, contentTextPaint) }
-
-    // Draw patient information
-    val patientInfoTextPaint = Paint().apply {
-        color = Color.BLACK
-        textSize = 20f
-    }
-    val patientInfoTextX = 50f // Adjust as needed
-    val patientInfoTextY = 400f // Adjust as needed
-    val lineSpacing = 20f
-    canvas.drawText("Name: $patientName", patientInfoTextX, patientInfoTextY, patientInfoTextPaint)
-    canvas.drawText(
-        "Age: $age",
-        patientInfoTextX,
-        patientInfoTextY + lineSpacing,
-        patientInfoTextPaint
-    )
-    canvas.drawText(
-        "Gender: $gender",
-        patientInfoTextX,
-        patientInfoTextY + lineSpacing * 2,
-        patientInfoTextPaint
-    )
-    canvas.drawText(
-        "Date: $date",
-        patientInfoTextX,
-        patientInfoTextY + lineSpacing * 3,
-        patientInfoTextPaint
-    )
-    canvas.drawText(
-        "Doctor Name: $doctorName",
-        patientInfoTextX,
-        patientInfoTextY + lineSpacing * 4,
-        patientInfoTextPaint
-    )
-
-    // Finish the page
-    pdfDocument.finishPage(page)
-
-    // Save the PDF to external storage
-    val dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-    val file = File(dir, "my_pdf_file.pdf")
-
-    try {
-        val fos = FileOutputStream(file)
-        pdfDocument.writeTo(fos)
-        fos.close()
-        pdfDocument.close()
-
-        // Notify the user that the PDF has been saved
-        Toast.makeText(context, "PDF saved successfully!", Toast.LENGTH_SHORT).show()
-    } catch (e: Exception) {
-        e.printStackTrace()
-        Toast.makeText(context, "Error saving PDF", Toast.LENGTH_SHORT).show()
-    }
-}
-
-
-//fun createAndSavePdf(content: String, context: Context) {
-//    val pdfDocument = PdfDocument()
-//    val pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create() // A4 size in points
-//
-//    val page = pdfDocument.startPage(pageInfo)
-//    val canvas = page.canvas
-//
-//    // Draw your content on the canvas (e.g., text, images, etc.)
-//    val paint = Paint()
-//    paint.color = Color.BLACK
-//    paint.textSize = 12f
-//    canvas.drawText(content, 50f, 50f, paint)
-//
-//
-//
-//    pdfDocument.finishPage(page)
-//
-//    // Save the PDF to external storage
-//    val dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-//    val file = File(dir, "my_pdf_file.pdf")
-//
-//    try {
-//        val fos = FileOutputStream(file)
-//        pdfDocument.writeTo(fos)
-//        fos.close()
-//        pdfDocument.close()
-//
-//        // Notify the user that the PDF has been saved
-//        Toast.makeText(context, "PDF saved successfully!", Toast.LENGTH_SHORT).show()
-//    } catch (e: Exception) {
-//        e.printStackTrace()
-//        Toast.makeText(context, "Error saving PDF", Toast.LENGTH_SHORT).show()
-//    }
-//}
