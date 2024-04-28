@@ -44,10 +44,10 @@ class MainActivity : ComponentActivity() {
                     val context = LocalContext.current
                     NavHost(navController = navController, startDestination = "Screen1") {
                         composable("home") {
-                            Home(coroutineScope, context, navController)
+                            Home(context, navController)
                         }
                         composable("diagnosis") {
-                            Diagnosis(coroutineScope, navController)
+                            Diagnosis(navController)
                         }
                         composable("Screen1") {
                             Screen1(coroutineScope, context, navController)
@@ -62,7 +62,7 @@ class MainActivity : ComponentActivity() {
 
                         }
                         composable("Login") {
-                            Login( context, coroutineScope,navController)
+                            Login( context,navController)
 
                         }
                         composable("Signup") {
@@ -74,8 +74,8 @@ class MainActivity : ComponentActivity() {
 
                         }
 
-                        composable("Report/{results}") {
-                            Report( context, coroutineScope,navController)
+                        composable("Report/{results}/{imagePath}") {
+                            Report( context,navController)
 
                         }
 

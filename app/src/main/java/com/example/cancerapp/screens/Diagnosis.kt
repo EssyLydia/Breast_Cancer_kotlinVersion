@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -25,6 +26,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material.icons.Icons
@@ -40,6 +42,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,12 +72,12 @@ import java.time.format.DateTimeFormatter
 @Composable
 
 fun Diagnosis(
-    coroutineScope: CoroutineScope,
     navController: NavController
 
 ) {
     val imageState = remember { mutableStateOf<Bitmap?>(null) }
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     val viewModel = ModelCode(context)
     var predictionResult by remember { mutableStateOf(Predictions()) }
@@ -93,11 +96,11 @@ fun Diagnosis(
                     imageState.value = bitmap
 
                     val currentDateTime = LocalDateTime.now()
-                    val formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")
+                    val formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss")
                     val formattedDateTime = currentDateTime.format(formatter)
 
                     // Save the bitmap to a file
-                    val imageName = "$formattedDateTime _breastSample.png"
+                    val imageName = "${formattedDateTime}BreastSample.png"
                     val file = File(context.cacheDir, imageName)
 
                     val imageOutput = FileOutputStream(file)
@@ -136,11 +139,18 @@ fun Diagnosis(
                         .fillMaxWidth()
                         .fillMaxHeight(.2f)
                 ) {
+                    Spacer(modifier = Modifier.size(15.dp))
                     Text(
-                        text = "Diagnosis And Classification",
+                        text = "Diagnosis And",
                         fontSize = 25.sp,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(10.dp)
+                        modifier = Modifier.padding(5.dp)
+                    )
+                    Text(
+                        text = "Classification",
+                        fontSize = 25.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(2.dp)
                     )
 
                 }
@@ -265,11 +275,13 @@ fun Diagnosis(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 Button(
+                    enabled = Path != "",
                     modifier = Modifier
                         .padding(8.dp),
                     onClick = {
                     coroutineScope.launch {
-                        navController.navigate("Report/${predictionResult.Benign},${predictionResult.Malignant},${predictionResult.Undefined}")
+                        Log.d(null, "-------Path: ${Path}------------------------")
+                        navController.navigate("Report/${predictionResult.Benign},${predictionResult.Malignant},${predictionResult.Undefined}/${Path.replace("/", "__")}")
                     }
                 }) {
                     Text(text = "Generate report", fontSize = 17.sp, fontWeight = FontWeight.SemiBold)

@@ -32,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,10 +58,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun Login(
     context: Context,
-    coroutine: CoroutineScope,
     navController: NavController,
 
     ) {
+    val coroutine = rememberCoroutineScope()
     var email by remember {
         mutableStateOf("")
     }
@@ -193,9 +194,8 @@ fun Login(
                     coroutine.launch {
                         if (password.isNotEmpty() && email.isNotEmpty()) {
                             Loginuser(email, password, navController,context)
-
-
                         }
+
 
                     }
                 }, modifier = Modifier
@@ -244,7 +244,7 @@ fun Loginuser(
         .addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 // Login successful
-                navController.navigate("Diagnosis")
+                navController.navigate("diagnosis")
             } else {
                 // Login failed
                 Toast.makeText(

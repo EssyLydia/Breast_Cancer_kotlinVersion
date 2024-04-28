@@ -1,6 +1,8 @@
 package com.example.cancerapp
 
 import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Paint
@@ -9,9 +11,12 @@ import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import android.os.Build
 import android.os.Environment
+import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.core.content.FileProvider
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -19,9 +24,10 @@ import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun createAndSavePdf(
+    imagePath: String,
     patientName: String,
     age: String,
-    gender: String,
+    address: String,
     date: String,
     doctorName: String,
     context: Context,
@@ -43,8 +49,8 @@ fun createAndSavePdf(
         textAlign = Paint.Align.CENTER
         typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD) // Set font family to serif and make it bold
     }
-    val reportTextX = pageInfo.pageWidth / 2f
-    val reportTextY = 35f // Adjust as needed
+    val reportTextX =  30f + pageInfo.pageWidth / 2f
+    val reportTextY = 50f // Adjust as needed
     canvas.drawText(reportText, reportTextX, reportTextY, reportTextPaint)
 
     // Draw an additional heading
@@ -82,63 +88,132 @@ fun createAndSavePdf(
     }
     canvas.drawLine(lineStartX, lineY, lineEndX, lineY, linePaint)
 
-
-
-    // Draw the light blue table (3 rows, 2 columns)
-    val tablePaint = Paint().apply {
-        color = Color.parseColor("#ADD8E6") // Light blue color
+    ///////////-------------------------------------------------
+    // Draw a blue rectangle
+    val rectanglePaint = Paint().apply {
+        color = Color.GRAY
     }
-    val cellWidth = (pageInfo.pageWidth - 50f) / 2f
-    val cellHeight = 50f
-    val tableStartY = lineY + 50f // Position below the "Results" text
+    val rectLeft = 50f
+    val rectTop = lineY + 50f
+    val rectRight = pageInfo.pageWidth / 2f + 50
+    val rectBottom = 500f
+    canvas.drawRect(rectLeft, rectTop, rectRight, rectBottom, rectanglePaint)
 
-    // Draw table cells without loops
-    val cellX1 = 50f
-    val cellX2 = cellWidth
-    val cellY1 = tableStartY
-    val cellY2 = tableStartY + cellHeight
-    val cellTextPaint = Paint().apply {
+    // Draw text inside the rectangle (left and right)
+    val rightText1 = result?.get(0)
+    val rightText2 = result?.get(1)
+    val rightText3 = result?.get(2)
+
+    val rightText4 = mutableListOf("Bengin", "0.0%")
+
+    if (rightText1?.toFloat()!! > rightText2?.toFloat()!! && rightText1?.toFloat()!! > rightText3?.toFloat()!!){
+        rightText4[0] = "Bengin"
+        rightText4[1] = rightText1
+    }else if (rightText2?.toFloat()!! > rightText1?.toFloat()!! && rightText2?.toFloat()!! > rightText3?.toFloat()!!){
+        rightText4[0] = "Malignant"
+        rightText4[1] = rightText2
+    }else{
+        rightText4[0] = "UnDefined"
+        if (rightText3 != null) {
+            rightText4[1] = rightText3
+        }
+    }
+
+
+    val textPaint = Paint().apply {
+        color = Color.WHITE
+        textSize = 24f
+        typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD)
+    }
+
+
+    canvas.drawText("Bengin:", rectLeft + 20f, rectTop + 50f, textPaint)
+    if (rightText1 != null) {
+        canvas.drawText("$rightText1%", rectRight - 125f, rectTop + 50f, textPaint)
+    }
+
+    canvas.drawText("Malignant:", rectLeft + 20f, rectTop + 100f, textPaint)
+    if (rightText2 != null) {
+        canvas.drawText("$rightText2%", rectRight - 125f, rectTop + 100f, textPaint)
+    }
+
+    canvas.drawText("Unknown:", rectLeft + 20f, rectTop + 150f, textPaint)
+    if (rightText3 != null) {
+        canvas.drawText("$rightText3%", rectRight - 125f, rectTop + 150f, textPaint)
+    }
+
+    val textPaint3 = Paint().apply {
+        color = Color.RED
+        textSize = 18f
+        typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD)
+    }
+    canvas.drawText("Final Results:", rectLeft + 20f, rectTop + 210f, textPaint3)
+    if (rightText4 != null) {
+        canvas.drawText(rightText4[0], rectRight - 135f, rectTop + 210f, textPaint3)
+    }
+
+
+
+    ///////////-------------------------------------------------
+
+    // Position the image to the right of the blue rectangle
+    val imageX = rectRight + 8f // Adjust as needed
+    val imageY = rectTop + 40f // Adjust as needed
+
+    val originalBitmap = BitmapFactory.decodeFile(imagePath)
+    val scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, 100, 100, false)
+    canvas.drawBitmap(scaledBitmap, imageX, imageY, Paint())
+
+    val textPaint2 = Paint().apply {
+        color = Color.BLACK
+        textSize = 24f
+        typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD)
+    }
+    canvas.drawText("--Sample--", rectRight+25, rectTop + 15, textPaint2)
+
+    val textPaint1 = Paint().apply {
+        color = Color.GREEN
+        textSize = 25f
+        typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD)
+    }
+
+    //----------Doctor Section
+    val docX = rectLeft
+    val docY = rectBottom + 40f
+    canvas.drawText("Doctor: ", docX, docY, textPaint1)
+    if (rightText4 != null) {
+        canvas.drawText(doctorName, rectRight - 140f, rectBottom + 40f, textPaint1)
+    }
+    //---------End of Doctor section
+
+    //------------------Patient----------------------
+    // Draw a horizontal solid line below the "Results" text
+    val lineStart2X = 50f
+    val lineEnd2X = pageInfo.pageWidth - 50f
+    val line2Y = docY + 20f // Position below the additional heading
+    canvas.drawLine(lineStart2X, line2Y, lineEnd2X, line2Y, linePaint)
+    canvas.drawText("Patient Details: ", docX, line2Y+30, textPaint2)
+    canvas.drawLine(lineStart2X, line2Y+40, lineEnd2X, line2Y+40, linePaint)
+    val text2Y = line2Y + 70
+    canvas.drawText("Names: ", docX, text2Y, textPaint2)
+    canvas.drawText(patientName, rectRight-160, text2Y, textPaint2)
+
+    canvas.drawText("Age: ", docX, text2Y+30, textPaint2)
+    canvas.drawText(age, rectRight-160, text2Y+30, textPaint2)
+
+    canvas.drawText("Address: ", docX, text2Y+60, textPaint2)
+    canvas.drawText(address, rectRight-160, text2Y+60, textPaint2)
+
+    val textPaint5 = Paint().apply {
         color = Color.BLACK
         textSize = 20f
-        textAlign = Paint.Align.LEFT
+        typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD_ITALIC)
     }
+    canvas.drawLine(lineStart2X, text2Y+70, lineEnd2X, text2Y+70, linePaint)
+    canvas.drawText("Date of Diagnosis: ", docX, text2Y+95, textPaint5)
+    canvas.drawText(date, rectRight-35, text2Y+95, textPaint5)
+    //-----------------------------------
 
-
-    // Draw cell 1 (Row 1, Col 1)
-    canvas.drawRect(cellX1, cellY1, cellX2, cellY2, tablePaint)
-    val cellText1 = "Benign"
-    canvas.drawText(cellText1, (cellX1 + cellX2) / 2f, (cellY1 + cellY2) / 2f, cellTextPaint)
-
-    // Draw cell 2 (Row 1, Col 2)
-    canvas.drawRect(cellX2, cellY1, cellX2 + cellWidth, cellY2, tablePaint)
-    val cellText2 = result?.get(0)
-    if (cellText2 != null) {
-        canvas.drawText(cellText2, (cellX2 + cellX2 + cellWidth) / 2f, (cellY1 + cellY2) / 2f, cellTextPaint)
-    }
-
-    // Draw cell 3 (Row 2, Col 1)
-    canvas.drawRect(cellX1, cellY2, cellX2, cellY2 + cellHeight, tablePaint)
-    val cellText3 = "Malignant"
-    canvas.drawText(cellText3, (cellX1 + cellX2) / 2f, (cellY2 + cellY2 + cellHeight) / 2f, cellTextPaint)
-
-    // Draw cell 4 (Row 2, Col 2)
-    canvas.drawRect(cellX2, cellY2, cellX2 + cellWidth, cellY2 + cellHeight, tablePaint)
-    val cellText4 = result?.get(1)
-    if (cellText4 != null) {
-        canvas.drawText(cellText4, (cellX2 + cellX2 + cellWidth) / 2f, (cellY2 + cellY2 + cellHeight) / 2f, cellTextPaint)
-    }
-
-    // Draw cell 5 (Row 3, Col 1)
-    canvas.drawRect(cellX1, cellY2 + cellHeight, cellX2, cellY2 + 2 * cellHeight, tablePaint)
-    val cellText5 = "UnDefined"
-    canvas.drawText(cellText5, (cellX1 + cellX2) / 2f, (cellY2 + cellY2 + 2 * cellHeight) / 2f, cellTextPaint)
-
-    // Draw cell 6 (Row 3, Col 2)
-    canvas.drawRect(cellX2, cellY2 + cellHeight, cellX2 + cellWidth, cellY2 + 2 * cellHeight, tablePaint)
-    val cellText6 = result?.get(2)
-    if (cellText6 != null) {
-        canvas.drawText(cellText6, (cellX2 + cellX2 + cellWidth) / 2f, (cellY2 + cellY2 + 2 * cellHeight) / 2f, cellTextPaint)
-    }
 
 
 
@@ -146,10 +221,20 @@ fun createAndSavePdf(
     pdfDocument.finishPage(page)
 
     // Save the PDF to external storage
-    val dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+    val dir = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
     val file = File(dir, "${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss"))}_Patient Report.pdf")
+    val xfile = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss"))}_Patient Report.pdf")
 
     try {
+        val fos = FileOutputStream(xfile)
+        pdfDocument.writeTo(fos)
+        fos.close()
+        pdfDocument.close()
+
+        // Notify the user that the PDF has been saved
+        Toast.makeText(context, "PDF saved successfully!", Toast.LENGTH_SHORT).show()
+
+    }catch (e: FileNotFoundException){
         val fos = FileOutputStream(file)
         pdfDocument.writeTo(fos)
         fos.close()
@@ -157,8 +242,25 @@ fun createAndSavePdf(
 
         // Notify the user that the PDF has been saved
         Toast.makeText(context, "PDF saved successfully!", Toast.LENGTH_SHORT).show()
+
     } catch (e: Exception) {
         e.printStackTrace()
         Toast.makeText(context, "Error saving PDF", Toast.LENGTH_SHORT).show()
     }
+
+
+//    try {
+//        // Open PDF using FileProvider
+//        val intent = Intent(Intent.ACTION_VIEW)
+//        val uri = FileProvider.getUriForFile(context, "com.example.cancerapp.reports", file)
+//        intent.setDataAndType(uri, "application/pdf")
+//        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+//        context.startActivity(intent)
+//    }catch (e: Exception){
+//        e.printStackTrace()
+//        Toast.makeText(context, "Failed to open PDF", Toast.LENGTH_SHORT).show()
+//    }
+
 }
+
+

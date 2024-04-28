@@ -16,6 +16,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,10 +32,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun Home(coroutine: CoroutineScope, context: Context, navController: NavController) {
+fun Home(context: Context, navController: NavController) {
+    val coroutine = rememberCoroutineScope()
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -63,7 +65,6 @@ fun Home(coroutine: CoroutineScope, context: Context, navController: NavControll
             Spacer(modifier = Modifier.height(10.dp))
             ElevatedButton(
                 onClick = {
-
                     coroutine.launch {
                         navController.navigate("Signup")
                     }
